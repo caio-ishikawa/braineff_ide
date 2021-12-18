@@ -1,3 +1,6 @@
+#[macro_use]
+extern crate exec_time;
+
 extern crate native_windows_gui as nwg;
 extern crate native_windows_derive as nwd;
 
@@ -53,7 +56,7 @@ impl Editr {
         println!("{:?}", self.code_edit.para_format());
         let code = interpreter::lexer(&self.code_edit.text());
         let parsed_code = interpreter::parse(code);
-        let output = interpreter::compile(parsed_code);
+        let (output, memory) = interpreter::compile(parsed_code);
         let output_box = &self.output_label;
         output_box.set_text(&output);
         //nwg::simple_message("Output", &output);
@@ -61,6 +64,11 @@ impl Editr {
 
     fn debug(&self){ 
         println!("DEBUG MODE");
+        let code = interpreter::lexer(&self.code_edit.text());
+        let parsed_code = interpreter::parse(code);
+        let output_box = &self.output_label;
+        let memory_output = interpreter::run_debug(parsed_code);
+        output_box.set_text(&memory_output);
     }
 }
 

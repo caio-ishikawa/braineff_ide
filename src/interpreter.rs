@@ -17,6 +17,7 @@ pub enum Operations {
 }
 
 // Reads file and returns list of chars containing the brainfuck commands //
+#[exec_time]
 pub fn lexer(file_name: &String) -> Vec<char> {
     let code_vector: Vec<char> = file_name.chars().filter(|&n| n == '>' || n == '<' || n == '+' || n == '-' || n == '[' || n == ']' || n == '.' || n == ',').collect();
     //parse(code_vector);
@@ -24,6 +25,7 @@ pub fn lexer(file_name: &String) -> Vec<char> {
 }
 
 // Turns list of brainfuck commands into a vector of type Operations //
+#[exec_time]
 pub fn parse(brain_code: Vec<char>) -> Vec<Operations> { 
     let mut code: Vec<Operations> = Vec::new();
 
@@ -46,7 +48,8 @@ pub fn parse(brain_code: Vec<char>) -> Vec<Operations> {
 }
 
 // Runs code and prints the memory tape for debugging purposes || WILL CHANGE LATER //
-pub fn compile(code: Vec<Operations>) -> String {
+#[exec_time]
+pub fn compile(code: Vec<Operations>) -> (String, Vec<u8>) {
     let mut memory: Vec<u8> = vec![0; 30000];
     let mut mem_ptr: usize = 0;
     let mut code_ptr: usize = 0;
@@ -77,9 +80,20 @@ pub fn compile(code: Vec<Operations>) -> String {
     }
     //println!("{:?}", memory);
     let output:String = log_ptr(output);
-    return output;
+    return (output, memory);
 }
 
+pub fn run_debug(code: Vec<Operations>) -> String { 
+    let (output, memory) = compile(vec![code[0]]);
+    println!("{:?}", memory);
+    let mut memory_output = String::new();
+    for i in memory{ 
+        memory_output.push_str(i.to_string().as_str());
+    }
+    return memory_output;
+}
+
+#[exec_time]
 fn log_ptr(byte: Vec<u8>) -> String { 
     let int_as_char: Vec<char> = byte.iter().map(|&n| n as char).collect();
     let output_as_str: String = int_as_char.into_iter().collect();
